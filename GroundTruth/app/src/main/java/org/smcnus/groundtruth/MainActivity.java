@@ -24,8 +24,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView stepsCountTextView;
 
-    private Calendar calendar;
-
     private ArrayList<Long> timestampList;
     private int stepCount;
 
@@ -51,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         initializeFileLogger();
-        initializeCalendar();
         initializeData();
         initializeWidgets();
     }
@@ -82,7 +79,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.recordTimestampBtn:
-                long timestamp = calendar.getTimeInMillis();
+                TimeZone timeZone = TimeZone.getTimeZone(SINGPAORE_TIMEZONE);
+                long timestamp = Calendar.getInstance(timeZone).getTimeInMillis();
                 addTimestampList(timestamp);
                 incrementStepCount();
                 break;
@@ -90,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.stopButton:
                 writeLogsToFile();
                 makeToast();
+                finish();
                 break;
         }
     }
@@ -109,15 +108,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
-    /*
-    * Calendar methods
-    * */
-
-    private void initializeCalendar() {
-        TimeZone timeZone = TimeZone.getTimeZone(SINGPAORE_TIMEZONE);
-        calendar = Calendar.getInstance(timeZone);
-    }
 
     /*
     * Data methods

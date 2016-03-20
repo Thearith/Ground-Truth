@@ -78,7 +78,7 @@ public class FileLogger {
 
     private void addTimestampsToLog(ArrayList<Long> timestamps) {
         for(int index=0; index<timestamps.size(); index++)
-            addTimestampToLog(index, timestamps.get(index));
+            addTimestampToLog(index+1, timestamps.get(index));
     }
 
     private void addTimestampToLog(int index, long timestamp) {
