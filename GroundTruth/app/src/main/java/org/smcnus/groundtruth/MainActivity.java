@@ -1,6 +1,8 @@
 package org.smcnus.groundtruth;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,14 +20,22 @@ import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String SINGPAORE_TIMEZONE = "Asia/Singapore";
+    private static final String SINGPAORE_TIMEZONE  = "Asia/Singapore";
+    private static final String TIME_THREAD         = "time_thread";
+
+    private static final int COUNTDOWN_TIMER        = 1000;
 
     private FileLogger fileLogger;
 
     private TextView stepsCountTextView;
+    private TextView timeLapsedTextView;
 
     private ArrayList<Long> timestampList;
     private int stepCount;
+    private int timeLapsed = 0;
+
+    private Handler timeHandler;
+    private Runnable timeRunnable;
 
 
     /*
@@ -51,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initializeFileLogger();
         initializeData();
         initializeWidgets();
+
+        initializeTimeThread();
     }
 
     @Override
@@ -95,6 +107,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /*
+    * Time method
+    * */
+
+    private void initializeTimeThread() {
+        initializeTimeHandler();
+        initializeTimeRunnable();
+    }
+
+    private void initializeTimeHandler() {
+        HandlerThread timeThread = new HandlerThread(TIME_THREAD);
+        timeThread.start();
+        timeHandler = new Handler(timeThread.getLooper());
+    }
+
+    private void initializeTimeRunnable() {
+        timeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                incrementTimeLapsed();
+                timeHandler.postDelayed(timeRunnable, COUNTDOWN_TIMER);
+            }
+        };
+
+        timeHandler.post(timeRunnable);
+    }
+
+
+    /*
     * File logger
     * */
 
@@ -135,6 +175,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         timestampList.add(timestamp);
     }
 
+    private void incrementTimeLapsed() {
+        timeLapsed += COUNTDOWN_TIMER;
+        updateTimeLapsedTextViewOnThread();
+    }
+
 
     /*
     * Widgets method
@@ -144,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initializeStepCountTextView();
         initializeRecordButton();
         initializeStopButton();
+        initializeTimeLapsedTextView();
     }
 
     private void initializeStepCountTextView() {
@@ -162,6 +208,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initializeStopButton() {
         LinearLayout stopButton = (LinearLayout) findViewById(R.id.stopButton);
         stopButton.setOnClickListener(this);
+    }
+
+    private void initializeTimeLapsedTextView() {
+        timeLapsedTextView = (TextView) findViewById(R.id.timeLapsedTextView);
+    }
+
+    private void updateTimeLapsedTextView() {
+        timeLapsedTextView.setText((timeLapsed/COUNTDOWN_TIMER) + " sec");
+    }
+
+    private void updateTimeLapsedTextViewOnThread() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                updateTimeLapsedTextView();
+            }
+        });
     }
 
     private void makeToast() {

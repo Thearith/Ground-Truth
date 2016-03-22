@@ -92,7 +92,7 @@ public class FileLogger {
     * */
 
     private String getFileName(long timestamp) {
-        return "Ground Truth - " + getDateFormat(timestamp);
+        return getDateFormat(timestamp) + " - Ground Truth Raw";
     }
 
     private String getDateFormat(long timestamp) {

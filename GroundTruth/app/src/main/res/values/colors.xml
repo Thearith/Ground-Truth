@@ -9,5 +9,6 @@
     <color name="border">#43A047</color>
     <color name="step_count">#c0392b</color>
     <color name="stop_color">#FF3D00</color>
+    <color name="taps_time_color">#3498DB</color>
 
 </resources>
